@@ -1,4 +1,3 @@
-use crate::modules::AppState;
 use tauri::Emitter;
 
 // 计算文件总大小的函数（模拟）

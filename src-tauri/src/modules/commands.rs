@@ -1,4 +1,4 @@
-use crate::modules::*;
+use crate::modules::{state::AppStateUpdate, *};
 use std::path::PathBuf;
 use tauri::AppHandle;
 use tracing::{debug, info};
@@ -34,9 +34,9 @@ pub fn get_backup_list() -> Vec<NvramBackup> {
 
 // 备份操作命令
 #[tauri::command]
-pub fn backup_nvram(app_handle: AppHandle, force: bool, clear_after: bool) -> Result<bool, String> {
+pub fn backup_nvram(handle: AppHandle, force: bool, clear_after: bool) -> Result<bool, String> {
     // 发送开始备份状态
-    AppState::info("开始执行NVRAM备份操作").emit_by(&app_handle);
+    handle.send_info("开始执行NVRAM备份操作");
 
     info!("执行备份操作: force={}, clear_after={}", force, clear_after);
     debug!(
@@ -47,7 +47,7 @@ pub fn backup_nvram(app_handle: AppHandle, force: bool, clear_after: bool) -> Re
     // 模拟备份操作，实际实现时会执行备份逻辑并同步到磁盘
 
     // 发送备份完成状态
-    AppState::info("NVRAM备份操作完成").emit_by(&app_handle);
+    handle.send_info("NVRAM备份操作完成");
     info!("备份操作完成");
     Ok(true)
 }
@@ -55,13 +55,13 @@ pub fn backup_nvram(app_handle: AppHandle, force: bool, clear_after: bool) -> Re
 // 还原操作命令
 #[tauri::command]
 pub fn restore_backup(
-    app_handle: AppHandle,
+    handle: AppHandle,
     backup_id: u32,
     clear_nvram: bool,
     clear_backup: bool,
 ) -> Result<bool, String> {
     // 发送开始还原状态
-    AppState::info("开始执行NVRAM还原操作").emit_by(&app_handle);
+    handle.send_info("开始执行NVRAM还原操作");
 
     info!(
         "执行还原操作: backup_id={}, clear_nvram={}, clear_backup={}",
@@ -75,7 +75,7 @@ pub fn restore_backup(
     // 模拟还原操作，实际实现时会执行还原逻辑并同步到磁盘
 
     // 发送还原完成状态
-    AppState::info("NVRAM还原操作完成").emit_by(&app_handle);
+    handle.send_info("NVRAM还原操作完成");
     info!("还原操作完成");
     Ok(true)
 }
@@ -84,7 +84,7 @@ pub fn restore_backup(
 #[tauri::command]
 pub fn delete_backup(app_handle: AppHandle, backup_id: u32) -> Result<bool, String> {
     // 发送开始删除状态
-    AppState::info(format!("开始执行删除备份操作: ID={}", backup_id)).emit_by(&app_handle);
+    app_handle.send_info(format!("开始执行删除备份操作: ID={}", backup_id));
 
     info!("执行删除备份操作: backup_id={}", backup_id);
     debug!("删除备份操作详细参数: backup_id={}", backup_id);
@@ -92,7 +92,7 @@ pub fn delete_backup(app_handle: AppHandle, backup_id: u32) -> Result<bool, Stri
     // 模拟删除操作，实际实现时会执行删除逻辑并同步到磁盘
 
     // 发送删除完成状态
-    AppState::info(format!("删除备份操作完成: ID={}", backup_id)).emit_by(&app_handle);
+    app_handle.send_info(format!("删除备份操作完成: ID={}", backup_id));
     info!("删除备份操作完成");
     Ok(true)
 }

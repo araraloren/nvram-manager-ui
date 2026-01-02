@@ -11,6 +11,8 @@ use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, Env
 mod modules;
 use modules::*;
 
+use crate::modules::state::AppStateUpdate;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // 初始化日志系统
@@ -81,7 +83,7 @@ pub fn run() {
                                 debug!("NVRAM目录发生变化: {:?}", event);
 
                                 // 发送目录变化状态
-                                AppState::info("NVRAM目录发生变化").emit_by(&app_handle);
+                                app_handle.send_info("NVRAM目录发生变化");
 
                                 // 获取更新后的NVRAM信息
                                 let updated_info = get_current_nvram_info(&watch_path);
@@ -91,8 +93,7 @@ pub fn run() {
                             }
                             Err(e) => {
                                 // 发送监听错误状态
-                                AppState::error(format!("NVRAM目录监听错误: {:?}", e))
-                                    .emit_by(&app_handle);
+                                app_handle.send_error(format!("NVRAM目录监听错误: {:?}", e));
                             }
                         }
                     }

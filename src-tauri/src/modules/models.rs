@@ -1,7 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
-use tauri::{AppHandle, Emitter};
 
 // PS版本结构体
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -42,69 +41,6 @@ pub struct NvramBackup {
     pub file_list: Vec<String>,
     #[serde(rename = "totalSize")]
     pub total_size: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Level {
-    Error,
-    Warn,
-    Info,
-}
-
-impl Level {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Level::Error => "error",
-            Level::Warn => "warning",
-            Level::Info => "info",
-        }
-    }
-}
-
-// 状态更新结构体
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AppState {
-    level: Level,
-    message: String,
-}
-
-impl AppState {
-    pub fn error(msg: impl Into<String>) -> Self {
-        Self {
-            level: Level::Error,
-            message: msg.into(),
-        }
-    }
-
-    pub fn info(msg: impl Into<String>) -> Self {
-        Self {
-            level: Level::Info,
-            message: msg.into(),
-        }
-    }
-
-    pub fn warn(msg: impl Into<String>) -> Self {
-        Self {
-            level: Level::Warn,
-            message: msg.into(),
-        }
-    }
-
-    pub fn emit_by(self, handle: &AppHandle) {
-        #[derive(Debug, Clone, Serialize, Deserialize)]
-        pub struct StatusUpdate {
-            level: String,
-            message: String,
-        }
-
-        let _ = handle.emit(
-            "status_updated",
-            StatusUpdate {
-                level: self.level.as_str().to_string(),
-                message: self.message,
-            },
-        );
-    }
 }
 
 // App配置结构体
