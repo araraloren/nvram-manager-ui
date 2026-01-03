@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 // PS版本结构体
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -60,6 +60,15 @@ pub struct AppConfig {
     pub clear_backup_on_restore: bool,
 }
 
-impl AppConfig {
-    pub async fn load(path: &Path) {}
+impl Default for AppConfig {
+    fn default() -> Self {
+        Self {
+            nvram_path: PathBuf::from(r"c:\opt\nvram"),
+            backup_path: PathBuf::from("."),
+            force_backup: true,
+            clear_after_backup: false,
+            clear_nvram_on_restore: true,
+            clear_backup_on_restore: false,
+        }
+    }
 }

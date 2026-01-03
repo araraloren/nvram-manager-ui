@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Emitter};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Level {
@@ -21,8 +20,8 @@ impl Level {
 // 状态更新结构体
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppState {
-    level: Level,
-    message: String,
+    pub level: Level,
+    pub message: String,
 }
 
 impl AppState {
@@ -44,42 +43,6 @@ impl AppState {
         Self {
             level: Level::Warn,
             message: msg.into(),
-        }
-    }
-}
-
-pub trait AppStateUpdate {
-    fn send_info(&self, msg: impl Into<String>) {
-        self.send_state(AppState::info(msg));
-    }
-
-    fn send_error(&self, msg: impl Into<String>) {
-        self.send_state(AppState::error(msg));
-    }
-
-    fn send_warn(&self, msg: impl Into<String>) {
-        self.send_state(AppState::warn(msg));
-    }
-
-    fn send_state(&self, state: AppState);
-}
-
-impl AppStateUpdate for AppHandle {
-    fn send_state(&self, state: AppState) {
-        #[derive(Debug, Clone, Serialize, Deserialize)]
-        pub struct StatusUpdate {
-            level: String,
-            message: String,
-        }
-
-        if let Err(e) = self.emit(
-            "status_updated",
-            StatusUpdate {
-                level: state.level.as_str().to_string(),
-                message: state.message,
-            },
-        ) {
-            tracing::error!("failed update state: {e:?}")
         }
     }
 }

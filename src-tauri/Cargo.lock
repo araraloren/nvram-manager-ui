@@ -9,6 +9,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa"
 
 [[package]]
+name = "ahash"
+version = "0.8.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a15f179cd60c4584b8a8c596927aadc462e27f2ca70c04e0071964a73ba7a75"
+dependencies = [
+ "cfg-if",
+ "getrandom 0.3.4",
+ "once_cell",
+ "version_check",
+ "zerocopy",
+]
+
+[[package]]
 name = "aho-corasick"
 version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -46,6 +59,35 @@ name = "anyhow"
 version = "1.0.100"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a23eb6b1614318a8071c9b2521f36b424b2c83db5eb3a0fead4a6c0809af6e61"
+
+[[package]]
+name = "aopt"
+version = "1.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dbf73cca0b4cf7872f6ba949ed5a0473c64dd4c6738b74c084e9fce2f3c9f90c"
+dependencies = [
+ "aopt-core",
+ "neure 0.6.6",
+]
+
+[[package]]
+name = "aopt-core"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b6d46e96cd783df5171c86cfb3440974cf4e997de55cd53063c7c8dd0da677e7"
+dependencies = [
+ "ahash",
+ "neure 0.7.1",
+]
+
+[[package]]
+name = "aopt-help"
+version = "0.3.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b986a4077adb47a8be99162b768adcffff1e947ee8cc1a10894d6b466d8b65dc"
+dependencies = [
+ "textwrap",
+]
 
 [[package]]
 name = "atk"
@@ -286,6 +328,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
 
 [[package]]
+name = "charize"
+version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a081d25a9b0ccd7c31528a00293e400b068ffe875febb7f1b53b634b00cf6bb8"
+
+[[package]]
+name = "charize"
+version = "0.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "035d70f1f68cd8d9a92acee4bb5db1ddbb330ddcfd9b497aabd70aec885ec573"
+
+[[package]]
 name = "chrono"
 version = "0.4.42"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -363,6 +417,28 @@ dependencies = [
  "bitflags 2.10.0",
  "core-foundation",
  "libc",
+]
+
+[[package]]
+name = "cote"
+version = "0.17.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e9c58f4c0b4096b18c1a9a12caf22a1ad2eb04bad59d46ac3f2effff1b7ca7f"
+dependencies = [
+ "aopt",
+ "aopt-help",
+ "cote-derive",
+]
+
+[[package]]
+name = "cote-derive"
+version = "0.12.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "14a70661d580733a4268dcc83e21013684800d56e1eb742ca92a77f55a008a6d"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.112",
 ]
 
 [[package]]
@@ -1805,6 +1881,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "neure"
+version = "0.6.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9d7bef90218e0834d40265bc2c2da9a8a36b077254f4b570d4887ee152d0cf54"
+dependencies = [
+ "charize 0.0.2",
+]
+
+[[package]]
+name = "neure"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "04c3b759b1ccd78ce4034dd370834db63e9056d7ee7d9622635a5dd2d4fbc84a"
+dependencies = [
+ "charize 0.0.3",
+]
+
+[[package]]
 name = "new_debug_unreachable"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1891,6 +1985,7 @@ name = "nvram-manager"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "cote",
  "log",
  "notify",
  "serde",
@@ -3013,6 +3108,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 
 [[package]]
+name = "smawk"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b7c388c1b5e93756d0c740965c41e8822f866621d41acbdf6336a6a168f8840c"
+
+[[package]]
 name = "socket2"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3457,6 +3558,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "textwrap"
+version = "0.16.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c13547615a44dc9c452a8a534638acdf07120d4b6847c8178705da06306a3057"
+dependencies = [
+ "smawk",
+ "unicode-width",
+]
+
+[[package]]
 name = "thiserror"
 version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3892,6 +4003,12 @@ name = "unicode-segmentation"
 version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f6ccf251212114b54433ec949fd6a7841275f9ada20dddd2f29e9ceea4501493"
+
+[[package]]
+name = "unicode-width"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4ac048d71ede7ee76d585517add45da530660ef4390e49b098733c6e897f254"
 
 [[package]]
 name = "url"
