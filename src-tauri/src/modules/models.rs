@@ -43,6 +43,11 @@ pub struct NvramBackup {
     pub total_size: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NvramBackupList {
+    pub nvrams: Vec<NvramBackup>,
+}
+
 // App配置结构体
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {

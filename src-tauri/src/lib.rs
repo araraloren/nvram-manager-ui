@@ -41,6 +41,8 @@ pub fn run() {
     info!("NVRAM Manager 应用启动");
 
     tauri::Builder::default()
+        .manage(AppConfig::default())
+        .manage(generate_backups())
         .invoke_handler(tauri::generate_handler!(
             modules::get_app_config,
             modules::get_backup_list,

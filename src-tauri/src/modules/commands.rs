@@ -1,21 +1,14 @@
 use crate::modules::{AppHandleExt, *};
 
 use std::path::PathBuf;
-use tauri::AppHandle;
+use tauri::{AppHandle, State};
 use tracing::{debug, info};
 
 // 获取配置信息的命令
 #[tauri::command]
-pub fn get_app_config() -> AppConfig {
+pub fn get_app_config(config: State<AppConfig>) -> AppConfig {
     // 这里暂时返回一个默认配置，后面会从文件读取
-    AppConfig {
-        nvram_path: PathBuf::from(r"C:\opt\nvram"),
-        backup_path: PathBuf::from(r"C:\opt\backups"),
-        force_backup: true,
-        clear_after_backup: false,
-        clear_nvram_on_restore: true,
-        clear_backup_on_restore: false,
-    }
+    config.inner().clone()
 }
 
 // 获取当前NVRAM信息的命令
@@ -28,9 +21,9 @@ pub fn get_current_nvram_info_command() -> NvramBackup {
 
 // 获取备份列表的命令
 #[tauri::command]
-pub fn get_backup_list() -> Vec<NvramBackup> {
+pub fn get_backup_list(list: State<NvramBackupList>) -> Vec<NvramBackup> {
     // 模拟从本地文件读取备份列表，目前使用随机生成的备份信息
-    generate_backups()
+    list.inner().nvrams.clone()
 }
 
 // 备份操作命令

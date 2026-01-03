@@ -1,10 +1,10 @@
 use crate::modules::utils::calculate_total_size;
-use crate::modules::{JChipVersion, NvramBackup, PsVersion};
+use crate::modules::{JChipVersion, NvramBackup, NvramBackupList, PsVersion};
 use chrono::Utc;
 use std::path::PathBuf;
 
 // 生成随机备份信息
-pub fn generate_backups() -> Vec<NvramBackup> {
+pub fn generate_backups() -> NvramBackupList {
     // 模拟游戏名称列表
     let game_names = [
         "HelloGame",
@@ -67,7 +67,7 @@ pub fn generate_backups() -> Vec<NvramBackup> {
         backups.push(backup);
     }
 
-    backups
+    NvramBackupList { nvrams: backups }
 }
 
 // 获取当前NVRAM信息
