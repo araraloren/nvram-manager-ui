@@ -1,4 +1,3 @@
-use crate::modules::utils::calculate_total_size;
 use crate::modules::{JChipVersion, NvramBackup, NvramBackupList, PsVersion};
 use chrono::Utc;
 use std::path::PathBuf;
@@ -50,18 +49,15 @@ pub fn generate_backups() -> NvramBackupList {
             path: PathBuf::from(r"C:\opt\jchip").join(jchip_versions[i % jchip_versions.len()]),
         };
 
-        // 计算文件总大小
-        let total_size = calculate_total_size(&file_list);
-
         // 创建备份信息
         let backup = NvramBackup {
             id: i as u32,
-            nvram_name: game_name,
+            nvram_name: game_name.clone(),
             ps_version,
             jchip_version,
             backup_time: Utc::now(),
             file_list: file_list.clone(),
-            total_size,
+            game_path: PathBuf::from(r"C:\Games").join(game_name),
         };
 
         backups.push(backup);
@@ -100,9 +96,6 @@ pub fn get_current_nvram_info(_nvram_path: &PathBuf) -> NvramBackup {
         "save2.dat".to_string(),
     ];
 
-    // 计算文件总大小
-    let total_size = calculate_total_size(&file_list);
-
     // 返回NvramBackup结构体
     NvramBackup {
         id: 0,
@@ -111,6 +104,6 @@ pub fn get_current_nvram_info(_nvram_path: &PathBuf) -> NvramBackup {
         jchip_version,
         backup_time: Utc::now(), // 使用当前时间作为备份时间
         file_list,
-        total_size,
+        game_path: PathBuf::from(r"C:\Games\HelloGame"),
     }
 }

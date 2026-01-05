@@ -39,13 +39,21 @@ pub struct NvramBackup {
     pub backup_time: DateTime<Utc>,
     #[serde(rename = "fileList")]
     pub file_list: Vec<String>,
-    #[serde(rename = "totalSize")]
-    pub total_size: String,
+    #[serde(rename = "gamePath")]
+    pub game_path: PathBuf,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NvramBackupList {
     pub nvrams: Vec<NvramBackup>,
+}
+
+// 游戏路径验证结果结构体
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GamePathValidationResult {
+    pub is_match: bool,
+    pub current_path: String,
+    pub backup_path: String,
 }
 
 // App配置结构体
@@ -55,8 +63,6 @@ pub struct AppConfig {
     pub nvram_path: PathBuf,
     #[serde(rename = "backupPath")]
     pub backup_path: PathBuf,
-    #[serde(rename = "forceBackup")]
-    pub force_backup: bool,
     #[serde(rename = "clearAfterBackup")]
     pub clear_after_backup: bool,
     #[serde(rename = "clearNvramOnRestore")]
@@ -70,7 +76,6 @@ impl Default for AppConfig {
         Self {
             nvram_path: PathBuf::from(r"c:\opt\nvram"),
             backup_path: PathBuf::from("."),
-            force_backup: true,
             clear_after_backup: false,
             clear_nvram_on_restore: true,
             clear_backup_on_restore: false,

@@ -29,7 +29,7 @@ export interface NvramBackup {
   jchipVersion: JChipVersion;
   backupTime: string;
   fileList: string[];
-  totalSize: string;
+  gamePath: string;
 }
 
 // 带NVRAM路径的信息类型（用于事件监听）
@@ -41,7 +41,6 @@ export interface NvramInfoWithPath extends NvramBackup {
 export interface AppConfig {
   nvramPath: string;
   backupPath: string;
-  forceBackup: boolean;
   clearAfterBackup: boolean;
   clearNvramOnRestore: boolean;
   clearBackupOnRestore: boolean;

@@ -12,14 +12,12 @@ const props = defineProps<{
 }>();
 
 // 开关状态
-const forceBackup = ref(props.appConfig.forceBackup);
 const clearAfterBackup = ref(props.appConfig.clearAfterBackup);
 
 // 执行备份操作
 const handleBackup = async () => {
   try {
     const result = await invoke<boolean>("backup_nvram", {
-      force: forceBackup.value,
       clearAfter: clearAfterBackup.value
     });
     if (result) {
@@ -38,7 +36,7 @@ const handleBackup = async () => {
     
     <div class="info-grid">
       <!-- 1. NVRAM路径 -->
-      <div class="info-item">
+      <div class="info-item full-width">
         <div class="info-icon path-icon">📁</div>
         <div class="info-content">
           <div class="info-label">NVRAM路径</div>
@@ -46,7 +44,16 @@ const handleBackup = async () => {
         </div>
       </div>
       
-      <!-- 2. NVRAM名称 -->
+      <!-- 2. 游戏路径 -->
+      <div class="info-item full-width">
+        <div class="info-icon path-icon">🎮</div>
+        <div class="info-content">
+          <div class="info-label">游戏路径</div>
+          <div class="info-value">{{ currentNvramInfo.gamePath }}</div>
+        </div>
+      </div>
+      
+      <!-- 3. NVRAM名称 -->
       <div class="info-item">
         <div class="info-icon game-icon">🎮</div>
         <div class="info-content">
@@ -55,21 +62,12 @@ const handleBackup = async () => {
         </div>
       </div>
       
-      <!-- 3. 文件数量 -->
+      <!-- 4. 文件数量 -->
       <div class="info-item">
         <div class="info-icon file-icon">📄</div>
         <div class="info-content">
           <div class="info-label">文件数量</div>
           <div class="info-value">{{ currentNvramInfo.fileList.length }}</div>
-        </div>
-      </div>
-      
-      <!-- 4. 文件总大小 -->
-      <div class="info-item">
-        <div class="info-icon size-icon">💽</div>
-        <div class="info-content">
-          <div class="info-label">文件总大小</div>
-          <div class="info-value">{{ currentNvramInfo.totalSize }}</div>
         </div>
       </div>
       
@@ -107,18 +105,6 @@ const handleBackup = async () => {
         
         <!-- 开关选项 -->
         <div class="backup-options">
-          <!-- 强制备份开关 -->
-          <div class="option-item">
-            <div class="option-content">
-              <div class="option-icon force-icon">⚠️</div>
-              <div class="option-label">强制备份</div>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" v-model="forceBackup">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          
           <!-- 备份后清除开关 -->
           <div class="option-item">
             <div class="option-content">

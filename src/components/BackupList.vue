@@ -3,12 +3,11 @@ import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 
 // 导入类型定义
-import type { NvramBackup, AppConfig } from '../types/index';
+import type { NvramBackup } from '../types/index';
 
 // 接收props
-const props = defineProps<{
+const { backups } = defineProps<{
   backups: NvramBackup[];
-  appConfig: AppConfig;
 }>();
 
 // 定义事件
@@ -19,12 +18,12 @@ const emit = defineEmits<{
 // 选中的备份
 const selectedBackup = ref<NvramBackup | null>(null);
 
-// 还原开关状态
-const clearNvramOnRestore = ref(props.appConfig.clearNvramOnRestore);
-const clearBackupOnRestore = ref(props.appConfig.clearBackupOnRestore);
-
 // 确认对话框状态
 const showConfirmDialog = ref(false);
+// NVRAM覆盖确认对话框状态
+const showOverwriteConfirm = ref(false);
+// 路径不匹配确认对话框状态
+const showPathMismatchConfirm = ref(false);
 
 // 选择备份
 const selectBackup = (backup: NvramBackup) => {
@@ -37,10 +36,36 @@ const handleRestore = async () => {
   if (!selectedBackup.value) return;
   
   try {
+    // 检查NVRAM是否存在
+    const nvramExists = await invoke<boolean>("check_nvram_existence");
+    
+    // 验证游戏路径是否匹配
+    const validationResult = await invoke<any>("validate_game_path", {
+      backupId: selectedBackup.value.id
+    });
+    
+    if (!validationResult.isMatch) {
+      // 如果路径不匹配，显示路径不匹配确认对话框
+      showPathMismatchConfirm.value = true;
+    } else if (nvramExists) {
+      // 如果路径匹配但NVRAM存在，显示覆盖确认对话框
+      showOverwriteConfirm.value = true;
+    } else {
+      // 如果路径匹配且NVRAM不存在，直接执行还原操作
+      await executeRestore();
+    }
+  } catch (error) {
+    console.error("还原操作失败:", error);
+  }
+};
+
+// 执行实际的还原操作
+const executeRestore = async () => {
+  if (!selectedBackup.value) return;
+  
+  try {
     const result = await invoke<boolean>("restore_backup", {
-      backupId: selectedBackup.value.id,
-      clearNvram: clearNvramOnRestore.value,
-      clearBackup: clearBackupOnRestore.value
+      backupId: selectedBackup.value.id
     });
     if (result) {
       console.log("还原成功");
@@ -49,6 +74,40 @@ const handleRestore = async () => {
   } catch (error) {
     console.error("还原失败:", error);
   }
+};
+
+// 处理覆盖确认
+const handleOverwriteConfirm = async () => {
+  // 关闭确认对话框
+  showOverwriteConfirm.value = false;
+  // 执行还原操作
+  await executeRestore();
+};
+
+// 取消覆盖
+const handleOverwriteCancel = () => {
+  showOverwriteConfirm.value = false;
+};
+
+// 处理路径不匹配确认
+const handlePathMismatchConfirm = async () => {
+  // 关闭确认对话框
+  showPathMismatchConfirm.value = false;
+  // 检查NVRAM是否存在
+  const nvramExists = await invoke<boolean>("check_nvram_existence");
+  
+  if (nvramExists) {
+    // 如果NVRAM存在，显示覆盖确认对话框
+    showOverwriteConfirm.value = true;
+  } else {
+    // 如果NVRAM不存在，直接执行还原操作
+    await executeRestore();
+  }
+};
+
+// 取消路径不匹配
+const handlePathMismatchCancel = () => {
+  showPathMismatchConfirm.value = false;
 };
 
 // 显示确认对话框
@@ -105,7 +164,7 @@ const handleCancelDelete = () => {
             </div>
             <div class="backup-item-meta">
               <div class="backup-item-date">{{ new Date(backup.backupTime).toLocaleString() }}</div>
-              <div class="backup-item-size">{{ backup.totalSize }} ({{ backup.fileList.length }} files)</div>
+              <div class="backup-item-size">{{ backup.fileList.length }} files</div>
             </div>
           </div>
         </div>
@@ -119,6 +178,10 @@ const handleCancelDelete = () => {
         <div class="info-card">
           <h3 class="list-title">备份详情</h3>
           <div class="backup-detail-content">
+            <div class="detail-item">
+              <div class="detail-label">游戏路径</div>
+              <div class="detail-value">{{ selectedBackup.gamePath }}</div>
+            </div>
             <div class="detail-item">
               <div class="detail-label">游戏名称</div>
               <div class="detail-value">{{ selectedBackup.nvramName }}</div>
@@ -139,38 +202,7 @@ const handleCancelDelete = () => {
               <div class="detail-label">文件数量</div>
               <div class="detail-value">{{ selectedBackup.fileList.length }}</div>
             </div>
-            <div class="detail-item">
-              <div class="detail-label">文件总大小</div>
-              <div class="detail-value">{{ selectedBackup.totalSize }}</div>
-            </div>
 
-            <!-- 还原选项 -->
-            <div class="restore-options">
-              <h4 class="options-title">还原选项</h4>
-              
-              <div class="restore-option-item">
-                <div class="option-content">
-                  <div class="option-icon clear-icon">🗑️</div>
-                  <div class="option-label">还原时清除NVRAM</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" v-model="clearNvramOnRestore">
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-              
-              <div class="restore-option-item">
-                <div class="option-content">
-                  <div class="option-icon clear-icon">🗑️</div>
-                  <div class="option-label">还原时清除当前备份</div>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" v-model="clearBackupOnRestore">
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-            </div>
-            
             <!-- 操作按钮区域 -->
             <div class="restore-button-container">
               <button class="restore-button" @click="handleRestore">
@@ -210,6 +242,42 @@ const handleCancelDelete = () => {
         </button>
         <button class="confirm-dialog-delete" @click="handleConfirmDelete">
           确定删除
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- NVRAM覆盖确认对话框 -->
+  <div v-if="showOverwriteConfirm" class="confirm-dialog-overlay">
+    <div class="confirm-dialog">
+      <h3 class="confirm-dialog-title">确认覆盖NVRAM</h3>
+      <p class="confirm-dialog-message">
+        当前NVRAM已存在，还原操作将覆盖现有数据，是否继续？
+      </p>
+      <div class="confirm-dialog-buttons">
+        <button class="confirm-dialog-cancel" @click="handleOverwriteCancel">
+          否
+        </button>
+        <button class="confirm-dialog-delete" @click="handleOverwriteConfirm">
+          是
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 路径不匹配确认对话框 -->
+  <div v-if="showPathMismatchConfirm" class="confirm-dialog-overlay">
+    <div class="confirm-dialog">
+      <h3 class="confirm-dialog-title">路径不匹配警告</h3>
+      <p class="confirm-dialog-message">
+        当前游戏路径与备份路径不匹配，还原操作可能导致数据异常，是否继续？
+      </p>
+      <div class="confirm-dialog-buttons">
+        <button class="confirm-dialog-cancel" @click="handlePathMismatchCancel">
+          否
+        </button>
+        <button class="confirm-dialog-delete" @click="handlePathMismatchConfirm">
+          是
         </button>
       </div>
     </div>

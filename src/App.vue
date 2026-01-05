@@ -23,7 +23,6 @@ watch(isDarkTheme, () => {
 const appConfig = ref<AppConfig>({
   nvramPath: "",
   backupPath: "",
-  forceBackup: true,
   clearAfterBackup: false,
   clearNvramOnRestore: true,
   clearBackupOnRestore: false
@@ -45,7 +44,7 @@ const currentNvramInfo = ref<NvramBackup>({
   },
   backupTime: "",
   fileList: [],
-  totalSize: ""
+  gamePath: ""
 });
 
 // 备份数据
@@ -126,7 +125,7 @@ const setupNvramInfoListener = async () => {
     console.log("收到NVRAM信息更新事件:", event.payload);
     // 更新当前NVRAM信息
     // 从事件中提取NvramBackup需要的字段
-    const { id, nvramName, psVersion, jchipVersion, fileList, totalSize } = event.payload;
+    const { id, nvramName, psVersion, jchipVersion, fileList, gamePath } = event.payload;
     currentNvramInfo.value = {
       id,
       nvramName,
@@ -134,7 +133,7 @@ const setupNvramInfoListener = async () => {
       jchipVersion,
       backupTime: event.payload.backupTime || "",
       fileList,
-      totalSize
+      gamePath
     };
   });
 };
@@ -217,8 +216,7 @@ onUnmounted(() => {
         <!-- 右侧栏 -->
         <div class="right-panel">
           <BackupList 
-            :backups="backups" 
-            :app-config="appConfig"
+            :backups="backups"
             @update-selected-backup="updateSelectedBackup"
           />
         </div>

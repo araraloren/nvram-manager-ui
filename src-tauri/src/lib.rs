@@ -49,7 +49,9 @@ pub fn run() {
             modules::backup_nvram,
             modules::restore_backup,
             modules::delete_backup,
-            modules::get_current_nvram_info_command
+            modules::get_current_nvram_info_command,
+            modules::check_nvram_existence,
+            modules::validate_game_path
         ))
         .setup(|app| {
             // 创建应用程序的引用，用于在监听器中访问
