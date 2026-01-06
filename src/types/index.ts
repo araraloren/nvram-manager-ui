@@ -39,9 +39,8 @@ export interface NvramInfoWithPath extends NvramBackup {
 
 // App配置类型
 export interface AppConfig {
-  nvramPath: string;
+  psPath: string;
+  jchipPath: string;
   backupPath: string;
   clearAfterBackup: boolean;
-  clearNvramOnRestore: boolean;
-  clearBackupOnRestore: boolean;
 }

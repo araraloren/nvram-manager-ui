@@ -191,8 +191,16 @@ const handleCancelDelete = () => {
               <div class="detail-value">{{ selectedBackup.psVersion.version }} (Build: {{ selectedBackup.psVersion.build }})</div>
             </div>
             <div class="detail-item">
+              <div class="detail-label">PS路径</div>
+              <div class="detail-value">{{ selectedBackup.psVersion.path }}</div>
+            </div>
+            <div class="detail-item">
               <div class="detail-label">JChip版本</div>
               <div class="detail-value">{{ selectedBackup.jchipVersion.version }} (Build: {{ selectedBackup.jchipVersion.build }})</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">JChip路径</div>
+              <div class="detail-value">{{ selectedBackup.jchipVersion.path }}</div>
             </div>
             <div class="detail-item">
               <div class="detail-label">备份时间</div>

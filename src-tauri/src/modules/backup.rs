@@ -1,5 +1,5 @@
 use crate::modules::{JChipVersion, NvramBackup, NvramBackupList, PsVersion};
-use chrono::Utc;
+use chrono::Local;
 use std::path::PathBuf;
 
 // 生成随机备份信息
@@ -55,7 +55,7 @@ pub fn generate_backups() -> NvramBackupList {
             nvram_name: game_name.clone(),
             ps_version,
             jchip_version,
-            backup_time: Utc::now(),
+            backup_time: Local::now(),
             file_list: file_list.clone(),
             game_path: PathBuf::from(r"C:\Games").join(game_name),
         };
@@ -102,7 +102,7 @@ pub fn get_current_nvram_info(_nvram_path: &PathBuf) -> NvramBackup {
         nvram_name: nvram_name.to_string(),
         ps_version,
         jchip_version,
-        backup_time: Utc::now(), // 使用当前时间作为备份时间
+        backup_time: Local::now(), // 使用当前时间作为备份时间
         file_list,
         game_path: PathBuf::from(r"C:\Games\HelloGame"),
     }

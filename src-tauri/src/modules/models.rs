@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -36,7 +36,7 @@ pub struct NvramBackup {
     #[serde(rename = "jchipVersion")]
     pub jchip_version: JChipVersion,
     #[serde(rename = "backupTime")]
-    pub backup_time: DateTime<Utc>,
+    pub backup_time: DateTime<Local>,
     #[serde(rename = "fileList")]
     pub file_list: Vec<String>,
     #[serde(rename = "gamePath")]
@@ -59,26 +59,23 @@ pub struct GamePathValidationResult {
 // App配置结构体
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
-    #[serde(rename = "nvramPath")]
-    pub nvram_path: PathBuf,
+    #[serde(rename = "psPath")]
+    pub ps_path: PathBuf,
+    #[serde(rename = "jchipPath")]
+    pub jchip_path: PathBuf,
     #[serde(rename = "backupPath")]
     pub backup_path: PathBuf,
     #[serde(rename = "clearAfterBackup")]
     pub clear_after_backup: bool,
-    #[serde(rename = "clearNvramOnRestore")]
-    pub clear_nvram_on_restore: bool,
-    #[serde(rename = "clearBackupOnRestore")]
-    pub clear_backup_on_restore: bool,
 }
 
 impl Default for AppConfig {
     fn default() -> Self {
         Self {
-            nvram_path: PathBuf::from(r"c:\opt\nvram"),
+            ps_path: PathBuf::from(r"c:\opt"),
+            jchip_path: PathBuf::from(r"c:\jchip"),
             backup_path: PathBuf::from("."),
             clear_after_backup: false,
-            clear_nvram_on_restore: true,
-            clear_backup_on_restore: false,
         }
     }
 }

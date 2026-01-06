@@ -21,11 +21,10 @@ watch(isDarkTheme, () => {
 
 // 配置数据
 const appConfig = ref<AppConfig>({
-  nvramPath: "",
+  psPath: "",
+  jchipPath: "",
   backupPath: "",
-  clearAfterBackup: false,
-  clearNvramOnRestore: true,
-  clearBackupOnRestore: false
+  clearAfterBackup: false
 });
 
 // 当前NVRAM信息（使用NvramBackup类型）

@@ -39,8 +39,8 @@ const handleBackup = async () => {
       <div class="info-item full-width">
         <div class="info-icon path-icon">📁</div>
         <div class="info-content">
-          <div class="info-label">NVRAM路径</div>
-          <div class="info-value">{{ appConfig.nvramPath }}</div>
+          <div class="info-label">PS路径</div>
+          <div class="info-value">{{ currentNvramInfo.psVersion.path }}</div>
         </div>
       </div>
       
