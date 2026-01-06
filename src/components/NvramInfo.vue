@@ -46,18 +46,18 @@ const handleBackup = async () => {
       
       <!-- 2. 游戏路径 -->
       <div class="info-item full-width">
-        <div class="info-icon path-icon">🎮</div>
+        <div class="info-icon path-icon">📁</div>
         <div class="info-content">
           <div class="info-label">游戏路径</div>
           <div class="info-value">{{ currentNvramInfo.gamePath }}</div>
         </div>
       </div>
       
-      <!-- 3. NVRAM名称 -->
+      <!-- 3. 游戏名称 -->
       <div class="info-item">
         <div class="info-icon game-icon">🎮</div>
         <div class="info-content">
-          <div class="info-label">NVRAM名称</div>
+          <div class="info-label">游戏名称</div>
           <div class="info-value">{{ currentNvramInfo.nvramName }}</div>
         </div>
       </div>

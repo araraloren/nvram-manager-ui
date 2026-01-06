@@ -160,7 +160,6 @@ const handleCancelDelete = () => {
           >
             <div class="backup-item-header">
               <div class="backup-item-name">{{ backup.nvramName }}_{{ backup.psVersion.version }}_{{ backup.jchipVersion.version }}</div>
-              <div class="backup-item-status">完成</div>
             </div>
             <div class="backup-item-meta">
               <div class="backup-item-date">{{ new Date(backup.backupTime).toLocaleString() }}</div>
