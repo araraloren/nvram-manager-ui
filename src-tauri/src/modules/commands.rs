@@ -2,7 +2,7 @@ use crate::modules::{AppHandleExt, *};
 
 use std::path::PathBuf;
 use tauri::{AppHandle, State};
-use tracing::{debug, info};
+use tracing::{debug, error, info};
 
 // 获取配置信息的命令
 #[tauri::command]
@@ -15,7 +15,7 @@ pub fn get_app_config(config: State<AppConfig>) -> AppConfig {
 #[tauri::command]
 pub fn get_current_nvram_info_command() -> NvramBackup {
     // 从配置中获取NVRAM路径，实际实现时会从配置文件读取
-    let nvram_path = PathBuf::from(r"C:\opt\nvram");
+    let nvram_path = PathBuf::from(r"D:\Tools");
     get_current_nvram_info(&nvram_path)
 }
 
@@ -23,7 +23,7 @@ pub fn get_current_nvram_info_command() -> NvramBackup {
 #[tauri::command]
 pub fn check_nvram_existence() -> bool {
     // // 从配置中获取NVRAM路径，实际实现时会从配置文件读取
-    // let nvram_path = PathBuf::from(r"C:\opt\nvram");
+    // let nvram_path = PathBuf::from(r"D:\Tools");
 
     // // 检查NVRAM路径是否存在
     // if !nvram_path.exists() {
@@ -109,6 +109,12 @@ pub fn backup_nvram(handle: AppHandle, clear_after: bool) -> Result<bool, String
     // 发送备份完成状态
     handle.update_state_info("NVRAM备份操作完成");
     info!("备份操作完成");
+
+    // 发送备份列表更新事件
+    if let Err(e) = handle.emit("backup_list_updated", ()) {
+        error!("发送备份列表更新事件失败: {:?}", e);
+    }
+
     Ok(true)
 }
 
@@ -126,6 +132,12 @@ pub fn restore_backup(handle: AppHandle, backup_id: u32) -> Result<bool, String>
     // 发送还原完成状态
     handle.update_state_info("NVRAM还原操作完成");
     info!("还原操作完成");
+
+    // 发送备份列表更新事件
+    if let Err(e) = handle.emit("backup_list_updated", ()) {
+        error!("发送备份列表更新事件失败: {:?}", e);
+    }
+
     Ok(true)
 }
 
@@ -143,5 +155,11 @@ pub fn delete_backup(app_handle: AppHandle, backup_id: u32) -> Result<bool, Stri
     // 发送删除完成状态
     app_handle.update_state_info(format!("删除备份操作完成: ID={}", backup_id));
     info!("删除备份操作完成");
+
+    // 发送备份列表更新事件
+    if let Err(e) = app_handle.emit("backup_list_updated", ()) {
+        error!("发送备份列表更新事件失败: {:?}", e);
+    }
+
     Ok(true)
 }

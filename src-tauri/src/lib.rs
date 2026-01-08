@@ -20,7 +20,7 @@ pub fn run() {
         // Debug模式：输出到命令行，彩色格式化
         tracing_subscriber::fmt()
             .with_env_filter(
-                EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")),
+                EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("debug")),
             )
             .with_ansi(true)
             .init();
@@ -33,7 +33,7 @@ pub fn run() {
         let (non_blocking, _guard) = non_blocking(file_appender);
 
         tracing_subscriber::registry()
-            .with(EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")))
+            .with(EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("debug")))
             .with(fmt::Layer::new().with_writer(non_blocking))
             .init();
     }
@@ -58,20 +58,41 @@ pub fn run() {
             let app_handle = app.app_handle().clone();
 
             // 从配置中获取NVRAM路径，实际实现时会从配置文件读取
-            let nvram_path = PathBuf::from(r"C:\opt\nvram");
+            let nvram_path = PathBuf::from(r"D:\Tools");
             let watch_path = nvram_path.clone();
 
             // 检查目录是否存在，如果不存在则跳过监听
             if watch_path.exists() {
                 debug!("开始监听NVRAM目录: {:?}", watch_path);
 
-                // 创建文件监听器通道
-                let (tx, rx) = channel();
+                // 创建一个克隆的app_handle和watch_path用于闭包
+                let app_handle_clone = app_handle.clone();
+                let watch_path_clone = watch_path.clone();
 
                 // 创建文件监听器
                 let mut watcher = RecommendedWatcher::new(
                     move |res| {
-                        tx.send(res).unwrap();
+                        match res {
+                            Ok(event) => {
+                                info!("NVRAM目录发生变化: {:?}", event);
+                                debug!("NVRAM目录发生变化: {:?}", event);
+
+                                // 发送目录变化状态
+                                app_handle_clone.update_state_info("NVRAM目录发生变化");
+
+                                // 获取更新后的NVRAM信息
+                                let updated_info = get_current_nvram_info(&watch_path_clone);
+
+                                // 发送事件通知前端
+                                let _ = app_handle_clone.emit("nvram_info_updated", updated_info);
+                            }
+                            Err(e) => {
+                                error!("NVRAM目录监听错误: {:?}", e);
+                                // 发送监听错误状态
+                                app_handle_clone
+                                    .update_state_error(format!("NVRAM目录监听错误: {:?}", e));
+                            }
+                        }
                     },
                     Config::default(),
                 )?;
@@ -79,30 +100,8 @@ pub fn run() {
                 // 开始监听NVRAM目录
                 watcher.watch(&watch_path, RecursiveMode::Recursive)?;
 
-                // 处理监听事件的线程
-                std::thread::spawn(move || {
-                    for res in rx {
-                        match res {
-                            Ok(event) => {
-                                debug!("NVRAM目录发生变化: {:?}", event);
-
-                                // 发送目录变化状态
-                                app_handle.update_state_info("NVRAM目录发生变化");
-
-                                // 获取更新后的NVRAM信息
-                                let updated_info = get_current_nvram_info(&watch_path);
-
-                                // 发送事件通知前端
-                                let _ = app_handle.emit("nvram_info_updated", updated_info);
-                            }
-                            Err(e) => {
-                                // 发送监听错误状态
-                                app_handle
-                                    .update_state_error(format!("NVRAM目录监听错误: {:?}", e));
-                            }
-                        }
-                    }
-                });
+                // 将watcher存储到堆上，延长其生命周期，直到应用退出
+                std::mem::forget(watcher);
             } else {
                 debug!("警告: NVRAM目录 {:?} 不存在，跳过监听", watch_path);
             }

@@ -61,6 +61,7 @@ const statusInfo = ref<StatusUpdate>({
 // 事件监听器引用
 let nvramInfoListener: UnlistenFn | null = null;
 let statusUpdateListener: UnlistenFn | null = null;
+let backupListListener: UnlistenFn | null = null;
 
 // 初始化主题
 const initTheme = () => {
@@ -148,6 +149,17 @@ const setupStatusUpdateListener = async () => {
   });
 };
 
+// 设置备份列表更新监听器
+const setupBackupListListener = async () => {
+  if (backupListListener) return;
+  
+  backupListListener = await listen("backup_list_updated", () => {
+    console.log("收到备份列表更新事件");
+    // 重新获取备份列表
+    fetchBackupList();
+  });
+};
+
 // 移除NVRAM信息变化监听器
 const removeNvramInfoListener = () => {
   if (nvramInfoListener) {
@@ -164,6 +176,14 @@ const removeStatusUpdateListener = () => {
   }
 };
 
+// 移除备份列表更新监听器
+const removeBackupListListener = () => {
+  if (backupListListener) {
+    backupListListener();
+    backupListListener = null;
+  }
+};
+
 // 更新选中的备份
 const updateSelectedBackup = (backup: any) => {
   selectedBackup.value = backup;
@@ -176,11 +196,13 @@ onMounted(async () => {
   fetchBackupList();
   await setupNvramInfoListener();
   await setupStatusUpdateListener();
+  await setupBackupListListener();
 });
 
 onUnmounted(() => {
   removeNvramInfoListener();
   removeStatusUpdateListener();
+  removeBackupListListener();
 });
 </script>
 
